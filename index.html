@@ -23,7 +23,6 @@
           notifyButton: {
             enable: true, 
           },
-          // 👇 EXPLICIT GITHUB PAGES FOLDER SCOPE 👇
           serviceWorkerParam: { scope: "/nt-mf-tracker/" },
           serviceWorkerPath: "nt-mf-tracker/OneSignalSDKWorker.js"
         });
@@ -374,7 +373,6 @@
           resetRefreshUI(); 
             
         } catch (err) {
-          // 👇 NEW: Force the error container to become visible again
           document.getElementById('loading-state').style.display = 'block';
           document.getElementById('page-dashboard').style.display = 'none';
           
@@ -438,16 +436,21 @@
           const day = data.dailyValue !== undefined ? data.dailyValue : (data.dailyChange || 0);
           const dayPct = data.dailyPct !== undefined ? data.dailyPct : (data.dailyChangePct || 0);
           
+          // Ensure percentage logic exists for dashboard cards
+          const plPct = data.plPct !== undefined ? data.plPct : (inv > 0 ? (pl / inv) * 100 : 0);
+          
           const plClass = pl < 0 ? 'loss' : (pl > 0 ? 'profit' : '');
           const dailyClass = day < 0 ? 'loss' : (day > 0 ? 'profit' : '');
           
           const lastUpdatedStr = rawData.lastUpdated || 'N/A';
-          // 👇 NEW: Extract CAS Timestamp from the backend payload
           const casUpdatedStr = rawData.casUpdated || 'Pending'; 
 
           const netStr = isNumbersHidden ? '₹ ••••••' : currencyFormatter.format(net);
           const invStr = isNumbersHidden ? '₹ ••••••' : currencyFormatter.format(inv);
+          
           const plStr = isNumbersHidden ? '••••••' : `${pl > 0 ? '+' : ''}${currencyFormatter.format(pl)}`;
+          const plPctStr = isNumbersHidden ? '(••.••%)' : `(${plPct > 0 ? '+' : ''}${plPct.toFixed(2)}%)`;
+          
           const dayStr = isNumbersHidden ? '••••••' : `${day > 0 ? '+' : ''}${currencyFormatter.format(day)}`;
           const dayPctStr = isNumbersHidden ? '(••.••%)' : `(${dayPct > 0 ? '+' : ''}${dayPct.toFixed(2)}%)`;
 
@@ -463,13 +466,13 @@
               </div>
               
               <div class="d-flex justify-content-between flex-wrap gap-1 pt-2" style="border-top: 1px solid rgba(255,255,255,0.1);">
-                <div><span class="dash-text-small d-block mb-0" style="line-height: 1.1;">Overall P&L</span><span class="${plClass} nowrap" style="font-size: clamp(0.9rem, 3.5vw, 1rem);">${plStr}</span></div>
+                <div><span class="dash-text-small d-block mb-0" style="line-height: 1.1;">Overall P&L</span><span class="${plClass} nowrap" style="font-size: clamp(0.9rem, 3.5vw, 1rem);">${plStr} <span style="font-size:0.85em;">${plPctStr}</span></span></div>
                 <div class="text-end"><span class="dash-text-small d-block mb-0" style="line-height: 1.1;">Day's Gain</span><span class="${dailyClass} nowrap" style="font-size: clamp(0.9rem, 3.5vw, 1rem);">${dayStr} <span style="font-size:0.85em;">${dayPctStr}</span></span></div>
               </div>
               
-              <div class="d-flex justify-content-between flex-wrap gap-2 pt-2 border-top border-secondary">
-                <div class="text-small">P&L: <span class="${plClass} nowrap">${plStr} <span style="font-size:0.85em;">${plPctStr}</span></span></div>
-                <div class="text-small">Day: <span class="${dailyClass} nowrap">${dayStr} <span style="font-size:0.85em;">${dayPctStr}</span></span></div>
+              <div class="text-center d-flex flex-column align-items-center mt-2">
+                <span class="dash-text-small mb-1" style="font-size: 0.65rem; opacity: 0.8; line-height: 1;">${lastUpdatedStr}</span>
+                <span class="dash-text-small" style="font-size: 0.55rem; opacity: 0.5; line-height: 1;">CAS Extracted: ${casUpdatedStr}</span>
               </div>
             </div>`;
         };
