@@ -374,12 +374,19 @@
           resetRefreshUI(); 
             
         } catch (err) {
+          // 👇 NEW: Force the error container to become visible again
+          document.getElementById('loading-state').style.display = 'block';
+          document.getElementById('page-dashboard').style.display = 'none';
+          
           document.getElementById('loading-state').innerHTML = `
             <div class="text-danger mt-3" style="background: rgba(255,0,0,0.1); padding: 15px; border-radius: 12px;">
-              <span style="font-size: 2rem;">🛑</span><br><b style="font-size: 1.1rem;">Connection Error</b><br>
+              <span style="font-size: 2rem;">🛑</span><br><b style="font-size: 1.1rem;">App Error</b><br>
               <span style="font-size: 0.8rem; opacity: 0.8;">${err.message}</span><br><br>
               <button class="btn btn-sm btn-outline-danger mt-2" onclick="loadData()">Try Again</button>
             </div>`;
+            
+          const dashContent = document.getElementById('dashboard-content');
+          if (dashContent) dashContent.classList.remove("is-switching");
         }
       }
 
